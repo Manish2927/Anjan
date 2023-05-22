@@ -1,0 +1,22 @@
+clc
+clear
+t_int=0;
+t_fi=5;
+h=0.001;
+x1(1)=0;
+x2(1)=0;
+x3(1)=0;
+t(1)=0;
+A=[0,1,0;0,0,1;-2,-3,-4];
+disp(spec(A))
+n=(t_fi - t_int)/h
+for i=1:n
+ x1(i+1)= x1(i)+h*x2(i);
+ x2(i+1)=x2(i)+h*x3(i);
+ x3(i+1)= x3(i)+h*(-2*x1(i)-3*x2(i)-4*x3(i)+4);
+ t(i+1)=t(i)+h;
+end
+plot(t, x1, 'r')
+plot(t, x2, 'y')
+plot(t, x3, 'b')
+legend('x1','x2','x3')

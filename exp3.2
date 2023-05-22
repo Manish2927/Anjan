@@ -1,0 +1,74 @@
+clc
+clear
+dimensions = 2;
+e_lower = -5;
+e_upper = 5;
+N = 15; /*We will take 15 particles*/
+w = 0.5;
+c1 = 0.7;
+c2 = 0.8;
+no_of_iter = 100;
+P = e_lower + (e_upper - e_lower)*rand(N, dimensions);
+V = zeros(N, dimensions); // Velocity
+obj = zeros(N, 1);
+pb_val = zeros(N, 1);
+pb_particle = zeros(N, 2);
+gb_val_min = %inf;
+// finding objective
+for i = 1:N
+ summ = 4*P(i, 1)^2 - 2.1*P(i, 1)^5 + (1/3)*P(i, 1)^6 + P(i, 1)*P(i, 2) -4*P(i, 2)^2+ 4*P(i, 2)^4;
+ 
+ obj(i, 1) = summ;
+ pb_val(i, 1) = obj(i, 1);
+ pb_particle(i, :) = P(i, :);
+ 
+ if obj(i,1) < gb_val_min
+ gb_val_min = obj(i, 1);
+ gb_particle_min(1, :) = P(i, :)
+ end
+ 
+end
+for k = 1:no_of_iter
+ for i = 1:N
+ for j = 1:dimensions
+ V(i, j) = w*V(i, j) + c1*rand(1, 1)*(pb_particle(i, j) - P(i, j))+c2*rand(1, 1)*(gb_particle_min(1, j) - P(i, j));
+ P(i, j) = P(i, j) + V(i, j)
+ 
+ if P(i,j) >5
+ P(i,j) = 5
+ end
+ 
+ if P(i,j) < -5
+ P(i,j) = -5
+ end
+ 
+ 
+ end
+ end
+ 
+ // Finding objective function to know personal best and global best
+ 
+ for i = 1:N
+ summ = 4*P(i, 1)^2 - 2.1*P(i, 1)^5 + (1/3)*P(i, 1)^6 + P(i, 1)*P(i, 2)- 4*P(i, 2)^2+ 4*P(i, 2)^4;
+ obj(i, 1) = summ;
+ 
+ // Finding the personal best and global best
+ 
+ if obj(i,1) < pb_val(i, 1)
+ pb_val(i, 1) = obj(i, 1);
+ pb_particle(i, :) = P(i, :);
+ end
+ 
+ 
+ 
+ if obj(i,1) < gb_val_min
+ gb_val_min = obj(i, 1);
+ gb_particle_min(1, :) = P(i, :)
+ end
+ 
+ end
+ 
+ gb_con(k, 1) = gb_val_min
+ 
+end
+plot(1:1:no_of_iter, gb_con)

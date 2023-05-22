@@ -1,0 +1,45 @@
+clc
+clear
+e_lower=-2;
+e_upper=5;
+t_lower=0;
+t_upper=5;
+h=0.001;
+n=(t_upper-t_lower)/h;
+e=e_lower+(e_upper-e_lower)*rand(1, 5000);
+disp(size(e));
+t=0.001:0.001:5
+disp(size(t));
+subplot(3,2,1)
+plot(t,e,"r");
+xlabel("t");
+ylabel("error");
+subplot(3,2,2)
+plot(t,e.^2,"b");
+xlabel("t");
+ylabel("error square");
+subplot(3,2,3)
+plot(t,abs(e),"k");
+xlabel("t");
+ylabel("absolute error");
+subplot(3,2,4)
+plot(t,t.*e^2,"y");
+xlabel("t");
+ylabel("time error");
+subplot(3,2,5)
+plot(t,t.*abs(e),"g");
+xlabel("t");
+ylabel("time*absolute_error");
+//error
+//ISE
+ISE=inttrap(t,e^2);
+mprintf("integral square error is:%f\n",ISE);
+//IAE
+IAE=inttrap(t,abs(e));
+mprintf("integral square error is:%f\n",IAE);
+//ITSE
+ITSE=inttrap(t,t.*e^2);
+mprintf("integral square error is:%f\n",ITSE);
+//ITAE
+ITAE=inttrap(t,t.*abs(e));
+mprintf("integral square error is:%f\n",ITAE);

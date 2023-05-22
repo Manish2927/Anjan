@@ -1,0 +1,104 @@
+clc
+clear
+A = [0 1 0; 0 0 1; 2 3 4];
+B = [0 0 1]';
+C = [1 0 0];
+/* Objective function*/
+function [ISE]=func(k1, k2, k3)
+ ti=0;
+ tf=5;
+ h=0.001;
+ U = 1;
+ n=(tf-ti)/h;
+ x1(1)=1;
+ x2(1)=2;
+ x3(1)=3;
+ t(1)=0
+ for i=1:n
+ x1(i+1)=x1(i)+h*(x2(i));
+ x2(i+1)=x2(i)+h*(x3(i));
+ x3(i+1)=x3(i)+h*((2- k1)*x1(i) + (3- k2)*x2(i)+(4-k3)*x3(i));
+ t(i+1)= t(i) + h
+ end
+ e = (1-x1)^2
+ 
+ ISE = inttrap(t, e);
+endfunction
+dimensions = 3;
+e_upper = 10;
+N = 15; /*We will take 15 particles*/
+w = 0.5;
+c1 = 0.7;
+c2 = 0.8;
+no_of_iter = 20;
+k1_lower = 2.1;
+k2_lower = 3.1;
+k3_lower = 4.1;
+k1 = k1_lower + (e_upper - k1_lower)*rand(N, 1);
+k2 = k2_lower + (e_upper - k2_lower)*rand(N, 1);
+k3 = k3_lower + (e_upper - k3_lower)*rand(N, 1);
+P = cat(2, k1, k2, k3);
+V = zeros(N, dimensions); // Velocity
+obj = zeros(N, 1);
+pb_val = zeros(N, 1);
+pb_particle = zeros(N, dimensions);
+gb_val_min = %inf;
+// finding objective
+for i = 1:N
+ summ = func(P(i, 1), P(i, 2), P(i, 3));
+ 
+ obj(i, 1) = summ;
+ pb_val(i, 1) = obj(i, 1);
+ pb_particle(i, :) = P(i, :);
+ 
+ if obj(i,1) < gb_val_min
+ gb_val_min = obj(i, 1);
+ gb_particle_min(1, :) = P(i, :)
+ end
+end
+for k = 1:no_of_iter
+ for i = 1:N
+ for j = 1:dimensions
+ V(i, j) = w*V(i, j) + c1*rand(1, 1)*(pb_particle(i, j) - P(i, j))+c2*rand(1, 1)*(gb_particle_min(1, j) - P(i, j));
+ updated_val = P(i, j) + V(i, j);
+ 
+ if (j == 1) & (updated_val > 2)
+ P(i,j) = updated_val
+ end
+ 
+ if (j == 2) & (updated_val > 3)
+ P(i,j) = updated_val
+ end
+ 
+ if (j == 3) & (updated_val > 4)
+ P(i,j) = updated_val
+ end
+ 
+ 
+ end
+ end
+ 
+ // Finding objective function to know personal best and global best
+ 
+ for i = 1:N
+ summ = func(P(i, 1), P(i, 2), P(i, 3));
+ obj(i, 1) = summ;
+ 
+ // Finding the personal best and global best
+ 
+ if obj(i,1) < pb_val(i, 1)
+ pb_val(i, 1) = obj(i, 1);
+ pb_particle(i, :) = P(i, :);
+ end
+ 
+ if obj(i,1) < gb_val_min
+ gb_val_min = obj(i, 1);
+ gb_particle_min(1, :) = P(i, :)
+ end
+ 
+ end
+ 
+ gb_con(k, 1) = gb_val_min
+ 
+end
+plot(1:1:no_of_iter, gb_con)
